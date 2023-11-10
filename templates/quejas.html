@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <title>Sistema de Quejas y Sugerencias</title>
+    <!-- Agrega tus estilos CSS aquí -->
+  </head>
+  <body>
+    <div class="page-containerQuejas">
+      <div class="quejas-container">
+        <h1>Sistema de Quejas y Sugerencias</h1>
+
+        <p>
+          Estamos interesados en tus comentarios. Por favor, comparte tus
+          quejas, sugerencias o comentarios a continuación:
+        </p>
+
+        <!-- Formulario para enviar quejas y sugerencias -->
+        <form id="quejas-form">
+          <div class="form-group">
+            <label class="label" for="nombre">Nombre:</label>
+            <input
+              class="input-field"
+              type="text"
+              id="nombre"
+              name="nombre"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label class="label" for="email">Correo Electrónico:</label>
+            <input
+              class="input-field"
+              type="email"
+              id="email"
+              name="email"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label class="label" for="comentario">Comentario:</label>
+            <textarea
+              id="comentario"
+              name="comentario"
+              rows="4"
+              cols="50"
+              required
+            ></textarea>
+          </div>
+          <button class="submit-button" type="submit">Enviar</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

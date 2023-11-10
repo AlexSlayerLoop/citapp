@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Agendador de Citas</title>
+</head>
+<body>
+
+  <div class="containerall">
+  <!--nav class="navbar-Ag">
+    <!--a href="index.html">Inicio</a>
+    <!--a href="login.html">Inicio sesion</a>
+    <!--a href="register.html">Registrarse</a-->
+    <!--a href="agendador.html" class="active">Agendador</a-->
+  </nav>
+    
+    <div class="page-containerAgenda">
+        <div class="agenda-container">
+            <h1>Agendador de Citas</h1>
+            <form id="agenda-form">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label for="fecha">Fecha</label>
+                    <input type="date" id="fecha" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label for="hora">Hora</label>
+                    <input type="time" id="hora" class="input-field" required>
+                </div>
+            </form>
+          <form id="agenda-form" method="post" action="confirmacion.php">
+              <!-- Resto de tu formulario -->
+              <button type="submit" class="submit-button">Agendar Cita</button>
+          </form>
+            <a href="/index.html">Volver a Inicio</a>
+        </div>
+        
+    </div>
+    </div>
+</body>
+</html>

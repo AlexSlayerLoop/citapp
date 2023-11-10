@@ -1,0 +1,35 @@
+{% extends "base.html" %} 
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Bienvenido a Vital Health Center</h1>
+  <p>
+    Ofrecemos atención médica de alta calidad para tu bienestar. Nuestro equipo
+    de profesionales está aquí para cuidar de ti. Con tecnología de vanguardia y
+    un enfoque centrado en el paciente, estamos listos para atenderte.
+  </p>
+  <img
+    src="{{ url_for('static', filename='images/Medico.jpg') }}"
+    alt="Médico"
+    class="small-image"
+  />
+  <div class="feature-box">
+    <span class="feature-icon">✓</span>
+    <h2 class="feature-heading">Tecnología Avanzada</h2>
+    <p>
+      Nuestra clínica utiliza tecnología de última generación para ofrecer la
+      mejor atención médica.
+    </p>
+  </div>
+  <div class="feature-box">
+    <span class="feature-icon">⏳</span>
+    <h2 class="feature-heading">Cuidado Personalizado</h2>
+    <p>
+      Enfocamos nuestros esfuerzos en el paciente para proporcionar atención
+      personalizada y efectiva.
+    </p>
+  </div>
+</div>
+{% endblock %}
