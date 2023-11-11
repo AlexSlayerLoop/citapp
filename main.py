@@ -170,10 +170,63 @@ def agendador():
     return render_template("agendador.html")
 
 
-@app.route("/quejas")
+@app.route("/quejas", methods=["GET", "POST"])
+@login_required
 def quejas():
-    return render_template("quejas.html")
+    if request.method == "POST":
+        get = request.form
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            query = "SELECT COUNT(*) AS existe_comentario FROM feedback WHERE id_usuario = {}".format(
+                current_user.id
+            )
+            cursor.execute(query)
+            datos = cursor.fetchone()
+
+        if datos["existe_comentario"]:
+            with mysql.connect() as conn:
+                cursor = conn.cursor()
+                query = """UPDATE feedback 
+                        SET evaluacion = {}, comentario = '{}' 
+                        WHERE id_usuario = {}""".format(
+                    get["evaluacion"], get["comentario"], current_user.id
+                )
+                cursor.execute(query)
+                conn.commit()
+            flash("Tu evaluacion ha sido actualizado correctamente")
+            return redirect(url_for("quejas"))
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            query = """INSERT INTO feedback (id_usuario, comentario, evaluacion)
+                       VALUES (%s, %s, %s)"""
+            values = (
+                current_user.id,
+                get["comentario"],
+                get["evaluacion"],
+            )
+            cursor.execute(query, values)
+            conn.commit()  # registra los datos en la base de datos
+        return render_template("quejas.html")
+
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        query = (
+            "SELECT evaluacion, comentario FROM feedback WHERE id_usuario = {}".format(
+                current_user.id
+            )
+        )
+        cursor.execute(query)
+        datos = cursor.fetchone()
+
+    evaluacion = ""
+    if datos:
+        for _ in range(int(datos["evaluacion"])):
+            evaluacion += "⭐"
+
+    return render_template("quejas.html", evaluacion=evaluacion, datos=datos)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
