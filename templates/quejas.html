@@ -22,19 +22,18 @@
       h3 {
         color: green;
       }
-
     </style>
   </head>
   <body>
     <nav class="navbar">
-      <a href="{{ url_for('user_page') }}">Inicio</a>
+      <a href="{{ url_for('user_page', user=current_user.nombre) }}">Inicio</a>
       <a href="{{ url_for('agendador') }}">Agendar</a>
       <a href="{{ url_for('quejas') }}">Quejas</a>
     </nav>
 
     {% if datos: %}
-      <h1><strong>Evaluacion: </strong>{{ evaluacion }}</h1>
-      <p>"{{ datos["comentario"] }}"</p>
+    <h1><strong>Evaluacion: </strong>{{ evaluacion }}</h1>
+    <p>"{{ datos["comentario"] }}"</p>
     {% endif %}
 
     <div class="page-containerQuejas">
@@ -46,13 +45,10 @@
           quejas, sugerencias o comentarios a continuación:
         </p>
 
-        {% with messages = get_flashed_messages() %} 
-          {% if messages %} 
-            {% for message in messages %}
-            <h3>{{ message }}</h3>
-            {% endfor %} 
-          {% endif %} 
-        {% endwith %}
+        {% with messages = get_flashed_messages() %} {% if messages %} {% for
+        message in messages %}
+        <h3>{{ message }}</h3>
+        {% endfor %} {% endif %} {% endwith %}
 
         <!-- Formulario para enviar quejas y sugerencias -->
         <form id="quejas-form" action="{{ url_for('quejas') }}" method="post">
