@@ -155,7 +155,7 @@ def register_user_page():
             password=user["password"],
         )
         login_user(new_user)
-        return redirect(url_for("user_page"))
+        return redirect(url_for("user_page", user=current_user.name))
     return render_template(
         "auth/register_user.html", logged_in=current_user.is_authenticated
     )

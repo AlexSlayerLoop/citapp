@@ -1,1 +1,94 @@
-<h1>Login page soon!</h1>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/register.css') }}"
+    />
+    <style>
+      .user {
+        width: 29rem;
+      }
+      .users {
+        max-width: 100rem;
+        margin: 0 auto;
+      }
+      .user-img {
+        width: 100%;
+        border-radius: 1.2rem;
+        height: 34rem;
+      }
+
+      .users-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 3.2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a class="navbar-brand" href="#">Vital Health Care</a>
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Register</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Log Out</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <section class="user-section">
+        <div class="users">
+          <div class="users-content">
+            <h3 class="users-heading">Ingresar Como</h3>
+
+            <figure class="user">
+              <img
+                class="user-img"
+                src="{{ url_for('static', filename='images/doctor.jpg') }}"
+              />
+              <div class="user-info">
+                <a class="sign-in-btn" href="#">Doctor</a>
+              </div>
+            </figure>
+
+            <figure class="user">
+              <img
+                class="user-img"
+                src="{{ url_for('static', filename='images/usuario.jpg') }}"
+              />
+              <div class="user-info">
+                <a class="sign-in-btn" href="{{ url_for('login_user_page') }}"
+                  >Usuario</a
+                >
+              </div>
+            </figure>
+
+            <figure class="user">
+              <img
+                class="user-img"
+                src="{{ url_for('static', filename='images/secretaria.jpg') }}"
+              />
+              <div class="user-info">
+                <a class="sign-in-btn" href="#">Secretaria</a>
+              </div>
+            </figure>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
