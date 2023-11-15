@@ -9,7 +9,6 @@ from flask import (
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import (
-    UserMixin,
     login_user,
     LoginManager,
     login_required,
@@ -18,6 +17,7 @@ from flask_login import (
 )
 from flaskext.mysql import MySQL
 from pymysql.cursors import DictCursor
+from users import User, Doctor, Secretary
 
 
 app = Flask(__name__)
@@ -37,8 +37,16 @@ login_manager.init_app(app)
 def load_user(user_id):
     with mysql.connect() as conn:
         cursor = conn.cursor()
+
         cursor.execute("SELECT * FROM usuario WHERE id = '{}'".format(user_id))
         user_data = cursor.fetchone()
+
+        cursor.execute("SELECT * FROM doctor WHERE id = '{}'".format(user_id))
+        doctor_data = cursor.fetchone()
+
+        cursor.execute("SELECT * FROM secretaria WHERE id = '{}'".format(user_id))
+        secretary_data = cursor.fetchone()
+
     if user_data:
         return User(
             id=user_data["id"],
@@ -47,16 +55,26 @@ def load_user(user_id):
             telefono=user_data["telefono"],
             password=user_data["password"],
         )
+    elif doctor_data:
+        return Doctor(
+            id=doctor_data["id"],
+            nombre=doctor_data["nombre"],
+            cedula=doctor_data["cedula"],
+            telefono=doctor_data["telefono"],
+            direccion=doctor_data["direccion"],
+            correo=doctor_data["correo"],
+            password=doctor_data["password"],
+        )
+    elif secretary_data:
+        return Secretary(
+            id=secretary_data["id"],
+            id_doctor=secretary_data["id_doctor"],
+            nombre=secretary_data["nombre"],
+            correo=secretary_data["correo"],
+            password=secretary_data["password"],
+        )
+
     return None
-
-
-class User(UserMixin):
-    def __init__(self, id, nombre, correo, telefono, password) -> None:
-        self.id = id
-        self.nombre = nombre
-        self.correo = correo
-        self.telefono = telefono
-        self.password = password
 
 
 @app.route("/")
@@ -78,6 +96,7 @@ def login():
     return render_template("auth/login.html")
 
 
+# login function for Users
 @app.route("/login/user", methods=["GET", "POST"])
 def login_user_page():
     if request.method == "POST":
@@ -113,6 +132,13 @@ def login_user_page():
     )
 
 
+# login function for Doctors
+@app.route("/login/doctor", methods=["GET", "POST"])
+def login_doctor_page():
+    return render_template("auth/login_doctor.html")
+
+
+# register user
 @app.route("/register/user", methods=["GET", "POST"])
 def register_user_page():
     if request.method == "POST":
@@ -155,15 +181,68 @@ def register_user_page():
             password=user["password"],
         )
         login_user(new_user)
-        return redirect(url_for("user_page", user=current_user.name))
+        return redirect(url_for("user_page", user=current_user.nombre))
     return render_template(
         "auth/register_user.html", logged_in=current_user.is_authenticated
     )
 
 
-@app.route("/register/doctor")
-def register_doctor():
-    return render_template("auth/register_doctor.html")
+@app.route("/register/doctor", methods=["GET", "POST"])
+def register_doctor_page():
+    if request.method == "POST":
+        get = request.form
+        correo = get["correo"]
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM doctor WHERE correo = '{}'".format(correo))
+            user = cursor.fetchone()
+
+        if user:
+            # if User already exists
+            flash("Ya has registrado este correo antes, mejor intenta ingresar!")
+            return redirect(url_for("login_doctor_page"))
+
+        hash_and_salt_password = generate_password_hash(
+            get["password"], method="pbkdf2:sha256", salt_length=8
+        )
+
+        query = """INSERT INTO doctor (nombre, cedula, telefono, direccion, correo, password) 
+                VALUES (%s, %s, %s, %s, %s, %s)"""
+        values = (
+            get["nombre"],
+            get["cedula"],
+            get["telefono"],
+            get["direccion"],
+            get["correo"],
+            hash_and_salt_password,
+        )
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, values)
+            conn.commit()  # registra los datos en la base de datos
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM doctor WHERE correo = '{}'".format(correo))
+            user = cursor.fetchone()
+
+        new_user = Doctor(
+            id=user["id"],
+            nombre=user["nombre"],
+            cedula=user["cedula"],
+            telefono=user["telefono"],
+            direccion=user["direccion"],
+            correo=user["correo"],
+            password=user["password"],
+        )
+        login_user(new_user)
+        return redirect(url_for("doctor_page", user=current_user.nombre))
+
+    return render_template(
+        "auth/register_doctor.html", logged_in=current_user.is_authenticated
+    )
 
 
 @app.route("/logout")
@@ -175,11 +254,17 @@ def log_out():
 @app.route("/user/<user>")
 @login_required
 def user_page(user):
+    for key, value in current_user.__dict__.items():
+        print(f"{key}: {value}")
+
     return render_template("user.html")
 
 
-@app.route("/doctor")
-def doctor_page():
+@app.route("/doctor/<user>")
+@login_required
+def doctor_page(user):
+    for key, value in current_user.__dict__.items():
+        print(f"{key}: {value}")
     return render_template("doctor.html")
 
 
@@ -199,7 +284,7 @@ def quejas():
     if request.method == "POST":
         get = request.form
 
-        query = "SELECT COUNT(*) AS existe_comentario FROM feedback WHERE id_usuario = {}".format(
+        query = "SELECT COUNT(*) AS existe_comentario FROM feedback WHERE id_usuario = '{}'".format(
             current_user.id
         )
         with mysql.connect() as conn:
@@ -208,7 +293,7 @@ def quejas():
             datos = cursor.fetchone()
 
         if datos["existe_comentario"]:
-            query = """UPDATE feedback SET evaluacion = {}, comentario = '{}' WHERE id_usuario = {}""".format(
+            query = "UPDATE feedback SET evaluacion = {}, comentario = '{}' WHERE id_usuario = '{}'".format(
                 get["evaluacion"], get["comentario"], current_user.id
             )
             with mysql.connect() as conn:
@@ -229,8 +314,10 @@ def quejas():
 
         return render_template("quejas.html")
 
-    query = "SELECT evaluacion, comentario FROM feedback WHERE id_usuario = {}".format(
-        current_user.id
+    query = (
+        "SELECT evaluacion, comentario FROM feedback WHERE id_usuario = '{}'".format(
+            current_user.id
+        )
     )
 
     with mysql.connect() as conn:
@@ -238,8 +325,8 @@ def quejas():
         cursor.execute(query)
         datos = cursor.fetchone()
 
+    evaluacion = ""
     if datos:
-        evaluacion = ""
         for _ in range(int(datos["evaluacion"])):
             evaluacion += "⭐"
 
