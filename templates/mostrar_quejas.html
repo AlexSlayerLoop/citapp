@@ -1,0 +1,30 @@
+{% extends "base_doctor.html" %}
+{% block title %}Feedback{% endblock %}
+
+{% block content %}
+<body>
+    <div class="container">
+        <h1>Ver quejas</h1>
+
+        <table class="table table-light table-striped table-hover">
+            <thead>
+                <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Comentario</th>
+                <th scope="col">Evaluacion</th>
+                </tr>
+            </thead>
+
+            {% for row in datos %}
+            <tr>
+            {% for item in row.values() %}
+
+            <td>{{ item }}</td>
+            {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>
+{% endblock %}

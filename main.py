@@ -401,5 +401,22 @@ def quejas():
     return render_template("quejas.html", evaluacion=evaluacion, datos=datos)
 
 
+@app.route("/ver_quejas")
+def mostrar_quejas():
+    query = """SELECT nombre, comentario, evaluacion
+                FROM feedback
+                INNER JOIN usuario
+                ON usuario.id = feedback.id_usuario
+                ORDER BY evaluacion DESC"""
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+    print(rows)
+
+    return render_template("mostrar_quejas.html", datos=rows)
+
+
 if __name__ == "__main__":
     app.run()
