@@ -111,7 +111,7 @@ def login_user_page():
 
         if not user:
             flash("Ese correo no ha sido registrado aun, intenta de nuevo.")
-            return redirect(url_for("login"))
+            return redirect(url_for("login_user_page"))
         # revisar si el hash de la contraseña ingresa es igual que en la base de datos
         elif not check_password_hash(user["password"], password):
             flash("Contraseña incorrecta, por favor intente de nuevo.")
@@ -135,7 +135,80 @@ def login_user_page():
 # login function for Doctors
 @app.route("/login/doctor", methods=["GET", "POST"])
 def login_doctor_page():
-    return render_template("auth/login_doctor.html")
+    if request.method == "POST":
+        get = request.form
+        correo = get["correo"]
+        password = get["password"]
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM doctor WHERE correo = '{}'".format(correo))
+            user = cursor.fetchone()
+
+        if not user:
+            flash("Ese correo no ha sido registrado aun, intenta de nuevo.")
+            return redirect(url_for("login_doctor_page"))
+        # revisar si el hash de la contraseña ingresa es igual que en la base de datos
+        elif not check_password_hash(user["password"], password):
+            flash("Contraseña incorrecta, por favor intente de nuevo.")
+            return redirect(url_for("login"))
+        else:
+            new_user = Doctor(
+                id=user["id"],
+                nombre=user["nombre"],
+                cedula=user["cedula"],
+                telefono=user["telefono"],
+                direccion=user["direccion"],
+                correo=user["correo"],
+                password=user["password"],
+            )
+            login_user(new_user)
+            return redirect(url_for("doctor_page", user=user["nombre"]))
+
+    return render_template(
+        "auth/login_doctor.html", logged_in=current_user.is_authenticated
+    )
+
+
+# login function for Secretary
+@app.route("/login/secretary", methods=["GET", "POST"])
+def login_secretary_page():
+    if request.method == "POST":
+        get = request.form
+        correo = get["correo"]
+        password = get["password"]
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM secretaria WHERE correo = '{}'".format(correo)
+            )
+            user = cursor.fetchone()
+
+        if not user:
+            flash("Ese correo no ha sido registrado aun, intenta de nuevo.")
+            return redirect(url_for("login_secretary_page"))
+        # revisar si el hash de la contraseña ingresa es igual que en la base de datos
+        elif not check_password_hash(user["password"], password):
+            flash("Contraseña incorrecta, por favor intente de nuevo.")
+            return redirect(url_for("login"))
+        else:
+            new_user = Secretary(
+                id=user["id"],
+                id_doctor=user["id_doctor"],
+                nombre=user["nombre"],
+                correo=user["correo"],
+                password=user["password"],
+            )
+            login_user(new_user)
+            return redirect(url_for("secretary_page", user=user["nombre"]))
+    return render_template("auth/login_secretary.html")
+
+
+@app.route("/logout")
+def log_out():
+    logout_user()
+    return redirect(url_for("home"))
 
 
 # register user
@@ -245,12 +318,6 @@ def register_doctor_page():
     )
 
 
-@app.route("/logout")
-def log_out():
-    logout_user()
-    return redirect(url_for("home"))
-
-
 @app.route("/user/<user>")
 @login_required
 def user_page(user):
@@ -265,6 +332,7 @@ def user_page(user):
 def doctor_page(user):
     for key, value in current_user.__dict__.items():
         print(f"{key}: {value}")
+
     return render_template("doctor.html")
 
 

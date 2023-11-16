@@ -1,6 +1,5 @@
-{% extends 'base.html' %} 
-{% block title %}Registrarse{% endblock %} 
-{% block content %}
+{% extends 'base.html' %} {% block title %}Registrarse{% endblock %} {% block
+content %}
 
 <div class="page-containerRe">
   <div class="Reg-container">
@@ -8,7 +7,7 @@
     <form
       id="register-form"
       method="post"
-      action="{{ url_for('register_doctor') }}"
+      action="{{ url_for('register_doctor_page') }}"
     >
       <div class="form-group">
         <label for="nombre">Nombre</label>

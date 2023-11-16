@@ -32,7 +32,8 @@
   <body>
     <header>
       <nav>
-        <a class="navbar-brand" href="#">Vital Health Care</a>
+        <a class="navbar-brand" href="{{ url_for('home') }}">Vital Health Care</a>
+        <!--
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
             <a class="nav-link" href="#">Home</a>
@@ -46,8 +47,8 @@
           <li class="nav-item">
             <a class="nav-link" href="#">Log Out</a>
           </li>
-        </ul>
-      </nav>
+        </ul>-->
+    </nav>
     </header>
     <main>
       <section class="user-section">
@@ -61,7 +62,9 @@
                 src="{{ url_for('static', filename='images/doctor.jpg') }}"
               />
               <div class="user-info">
-                <a class="sign-in-btn" href="#">Doctor</a>
+                <a class="sign-in-btn" href="{{ url_for('login_doctor_page') }}"
+                  >Doctor</a
+                >
               </div>
             </figure>
 
@@ -83,7 +86,11 @@
                 src="{{ url_for('static', filename='images/secretaria.jpg') }}"
               />
               <div class="user-info">
-                <a class="sign-in-btn" href="#">Secretaria</a>
+                <a
+                  class="sign-in-btn"
+                  href="{{ url_for('login_secretary_page') }}"
+                  >Secretaria</a
+                >
               </div>
             </figure>
           </div>
