@@ -1,20 +1,13 @@
-{% extends 'base.html' %} 
-
-{% block title %}Login{% endblock %} 
+{% extends 'base.html' %} {% block title %}Login{% endblock %}
 
 <!-- {% block profile %}
   <a class="nav-link" href="{{ url_for('user_page', user=current_user.nombre) }}">{{ current_user.nombre }}</a>
 {% endblock %} -->
 
-{% block content %} 
-
-{% with messages = get_flashed_messages() %} 
-  {% if messages %} 
-    {% for message in messages %}
-      <h4>{{ message }}</h4>
-    {% endfor %} 
-  {% endif %} 
-{% endwith %}
+{% block content %} {% with messages = get_flashed_messages() %} {% if messages
+%} {% for message in messages %}
+<h4>{{ message }}</h4>
+{% endfor %} {% endif %} {% endwith %}
 
 <div class="page-containerIn">
   <div class="login-container">

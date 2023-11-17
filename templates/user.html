@@ -10,14 +10,18 @@
     <title>Interfaz de Usuario</title>
     <style>
       body {
-        font-family: "Times New Roman", sans-serif;
         background-color: #f5f5f5;
         margin: 0;
         padding: 0;
         display: flex;
         flex-direction: column;
       }
-
+      .info {
+        color: green;
+      }
+      .error {
+        color: red;
+      }
     </style>
   </head>
 
@@ -25,8 +29,14 @@
     <nav class="navbar">
       <a href="{{ url_for('home') }}">Home</a>
       <a href="{{ url_for('agendador') }}">Agendar</a>
+      <a href="{{ url_for('register_patient_page') }}">Registar Paciente</a>
       <a href="{{ url_for('quejas') }}">Quejas</a>
     </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <h3 class="{{ category }}">{{ message }}</h3>
+    {% endfor %} {% endif %} {% endwith %}
 
     <div class="usercontainer">
       <div class="section">
@@ -46,7 +56,5 @@
         </ul>
       </div>
     </div>
-
   </body>
-
 </html>

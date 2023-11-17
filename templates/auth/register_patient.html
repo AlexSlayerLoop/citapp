@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <title>Sistema de Quejas y Sugerencias</title>
+    <!-- Agrega tus estilos CSS aquí -->
+    <style>
+      body {
+        background-color: lightblue;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 50px;
+      }
+
+      h3 {
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="{{ url_for('user_page', user=current_user.nombre) }}">Inicio</a>
+      <a href="{{ url_for('agendador') }}">Agendar</a>
+      <a href="{{ url_for('register_patient_page') }}">Registar Paciente</a>
+      <a href="{{ url_for('quejas') }}">Quejas</a>
+    </nav>
+
+    <div class="page-containerRe">
+      <div class="Reg-container">
+        <h1>Registrar Secretaria</h1>
+        <form
+          id="register-form"
+          method="post"
+          action="{{ url_for('register_patient_page') }}"
+        >
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input
+              type="text"
+              id="nombre"
+              name="nombre"
+              class="input-field"
+              required="required"
+              maxlength="255"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+            <input
+              type="date"
+              id="fecha_nacimiento"
+              name="fecha_nacimiento"
+              class="input-field"
+              placeholder="##/##/####"
+              required="required"
+            />
+          </div>
+
+          <div class="form-group">
+            <div class="mb-3 required">
+              <label class="label" for="genero">Genero</label>
+              <select class="form-select" id="genero" name="genero" required>
+                <option value="H">Hombre</option>
+                <option value="M">Mujer</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="direccion">Direccion</label>
+            <input
+              type="text"
+              id="direccion"
+              name="direccion"
+              class="input-field"
+              placeholder="calle mexico #2178"
+              required="required"
+              maxlength="255"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="peso">Peso</label>
+            <input
+              type="number"
+              id="peso"
+              name="peso"
+              min="0"
+              max="500"
+              step="0.100"
+              class="input-field"
+              placeholder="70.90"
+              required="required"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="estatura">Estatura (m)</label>
+            <input
+              type="number"
+              id="estatura"
+              name="estatura"
+              class="input-field"
+              min="0"
+              value="1.50"
+              placeholder="1.90"
+              required="required"
+              max="3"
+              step="0.01"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="relacion">Relacion (Usuario/Paciente)</label>
+            <input
+              type="text"
+              id="relacion"
+              name="relacion"
+              class="input-field"
+              max="500"
+              placeholder="Familiar, trabajador, etc..."
+            />
+          </div>
+
+          <input
+            type="hidden"
+            id="id_usuario"
+            name="id_usuario"
+            value="{{ current_user.id }}"
+          />
+
+          <input
+            type="hidden"
+            id="nombre_usuario"
+            name="nombre_usuario"
+            value="{{ current_user.nombre }}"
+          />
+
+          <button type="submit" class="submit-button">Registrarse</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

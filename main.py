@@ -260,6 +260,47 @@ def register_user_page():
     )
 
 
+@app.route("/register/patient", methods=["GET", "POST"])
+@login_required
+def register_patient_page():
+    if request.method == "POST":
+        get = request.form
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) AS total FROM paciente")
+            pacientes = cursor.fetchone()
+
+        if pacientes["total"] > 5:
+            flash("Ya has registrado el numero maximo de pacientes", "error")
+            return redirect(url_for("user_page", user=get["nombre_usuario"]))
+
+        query = """
+            INSERT INTO paciente (id_usuario, nombre, fecha_nacimiento, genero, direccion, peso_kg, estatura_mts, relacion)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        values = (
+            get["id_usuario"],
+            get["nombre"],
+            get["fecha_nacimiento"],
+            get["genero"],
+            get["direccion"],
+            get["peso"],
+            get["estatura"],
+            get["relacion"],
+        )
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, values)
+            conn.commit()
+
+        flash("Has registrado a un nuevo paciente exitosamente ^_^", "info")
+        return redirect(url_for("user_page", user=get["nombre_usuario"]))
+
+    return render_template("auth/register_patient.html")
+
+
 @app.route("/register/doctor", methods=["GET", "POST"])
 def register_doctor_page():
     if request.method == "POST":

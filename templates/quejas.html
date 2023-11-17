@@ -11,7 +11,6 @@
     <!-- Agrega tus estilos CSS aquí -->
     <style>
       body {
-        font-family: "Times New Roman", sans-serif;
         background-color: lightblue;
         margin: 0;
         padding: 0;
@@ -28,6 +27,7 @@
     <nav class="navbar">
       <a href="{{ url_for('user_page', user=current_user.nombre) }}">Inicio</a>
       <a href="{{ url_for('agendador') }}">Agendar</a>
+      <a href="{{ url_for('register_patient_page') }}">Registar Paciente</a>
       <a href="{{ url_for('quejas') }}">Quejas</a>
     </nav>
 
