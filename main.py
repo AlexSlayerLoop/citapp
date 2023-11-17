@@ -271,7 +271,7 @@ def register_patient_page():
             cursor.execute("SELECT COUNT(*) AS total FROM paciente")
             pacientes = cursor.fetchone()
 
-        if pacientes["total"] > 5:
+        if pacientes["total"] >= 5:
             flash("Ya has registrado el numero maximo de pacientes", "error")
             return redirect(url_for("user_page", user=get["nombre_usuario"]))
 
@@ -297,8 +297,44 @@ def register_patient_page():
 
         flash("Has registrado a un nuevo paciente exitosamente ^_^", "info")
         return redirect(url_for("user_page", user=get["nombre_usuario"]))
-
     return render_template("auth/register_patient.html")
+
+
+@app.route("/register/secretary", methods=["GET", "POST"])
+@login_required
+def register_secretary_page():
+    if request.method == "POST":
+        get = request.form
+        correo = get["correo"]
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM secretaria WHERE correo = '{}'".format(correo)
+            )
+            user = cursor.fetchone()
+
+        if user:
+            flash("Ya has registrado ese correo, intenta con otra cuenta", "error")
+            return redirect(url_for("register_secretary_page"))
+
+        hash_and_salt_password = generate_password_hash(
+            get["password"], method="pbkdf2:sha256", salt_length=8
+        )
+
+        query = """INSERT INTO secretaria (id_doctor, nombre, correo, password)
+                    VALUES (%s, %s, %s, %s)"""
+        values = (get["id_doctor"], get["nombre"], correo, hash_and_salt_password)
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, values)
+            conn.commit()
+
+        flash("Has registrado un nuevo perfil administrativo exitosamente ^_^", "info")
+        return redirect(url_for("register_secretary_page"))
+
+    return render_template("auth/register_secretary.html")
 
 
 @app.route("/register/doctor", methods=["GET", "POST"])
@@ -377,8 +413,10 @@ def doctor_page(user):
     return render_template("doctor.html")
 
 
-@app.route("/secretary")
-def secretary_page():
+@app.route("/secretary/<user>")
+def secretary_page(user):
+    for key, value in current_user.__dict__.items():
+        print(f"{key}: {value}")
     return render_template("secretary.html")
 
 

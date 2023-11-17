@@ -1,4 +1,3 @@
-
 /*  ----|Body|----  */
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -15,25 +14,25 @@ body {
   height: 200px;
   transition: transform 0.3s, box-shadow 0.3s;
 }
-.header-Ini{
+.header-Ini {
   background-color: #0073e6;
   color: #fff;
   margin-top: 30px;
   padding: 10px;
 }
-.header-Med{
+.header-Med {
   background-color: greenyellow;
   color: #fff;
   margin-top: 30px;
   padding: 10px;
 }
-.header-Sec{
+.header-Sec {
   background-color: indianred;
   color: #fff;
   margin-top: 30px;
   padding: 10px;
 }
-.header-User{
+.header-User {
   background-color: white;
   color: #fff;
   margin-top: 30px;
@@ -43,7 +42,6 @@ body {
   position: relative;
   display: inline-block;
   cursor: pointer;
-
 }
 .logo-container:hover .logo {
   transform: scale(1.1);
@@ -105,7 +103,6 @@ p {
   align-items: center;
   animation: colorChange 5s infinite alternate;
   border-radius: 10px;
-
 }
 
 .page-containerIn a,
@@ -114,7 +111,7 @@ p {
   background-color: black;
   color: white;
   font-size: 20px;
-  padding: .5em;
+  padding: 0.5em;
   margin: 1.5em;
   border-radius: 5px;
 }
@@ -138,16 +135,17 @@ p {
   padding: 50px;
   text-align: center;
 }
-.login-container a, .login-container p{
+.login-container a,
+.login-container p {
   text-decoration: none;
   color: black;
   font-size: 20px;
   background-color: #fff;
-  border:none;
+  border: none;
 }
-.login-container a:hover{
-  color:red;
-  border:none;
+.login-container a:hover {
+  color: red;
+  border: none;
 }
 .Reg-container {
   background-color: #fff;
@@ -158,7 +156,6 @@ p {
 }
 /* ----|Animation border color change infinite|----*/
 @keyframes colorChange {
-
   0%,
   100% {
     border: 2px solid red;
@@ -171,7 +168,6 @@ p {
   66% {
     border: 2px solid blue;
   }
-
 }
 
 .form-group {
@@ -224,7 +220,7 @@ p {
   align-items: center;
   top: 0;
   left: 0;
-  right: 0; 
+  right: 0;
   z-index: 999;
 }
 
@@ -279,74 +275,70 @@ p {
   cursor: pointer;
 }
 /*-----------------|*agendador*|-----------------*/
-.containerall{
+.containerall {
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.agenda-container{
+.agenda-container {
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
   padding: 20px;
   text-align: center;
 }
-.agenda-container button{
+.agenda-container button {
   margin-bottom: 30px;
 }
-.navbar-Ag{
-    background-color: #fff;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 2em;
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 999;
+.navbar-Ag {
+  background-color: #fff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 2em;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
 }
 
-
-.agenda-container a{
+.agenda-container a {
   text-decoration: none;
   background-color: black;
   color: white;
   font-size: 20px;
-  padding: .5em;
+  padding: 0.5em;
   margin: 1.5em;
   border-radius: 10px;
 }
 
 /* ----|Medico|---- */
 
-.medico-container form{
+.medico-container form {
   text-align: center;
-
 }
-.medico-container h1{
+.medico-container h1 {
   text-align: center;
-
 }
 
-.medico-container h2{
+.medico-container {
   text-align: center;
   margin-bottom: 30px;
   margin-top: 30px;
 }
 
-.results a{
+.results a {
   text-decoration: none;
   color: white;
-
 }
 
-.results li{
+.results li {
   background-color: #007bff;
   color: #fff;
   border: none;
@@ -357,17 +349,17 @@ p {
   margin-bottom: 20px;
 }
 
-.expediente-container{
+.expediente-container {
   border: solid 1px black;
   padding: 30px;
   background-color: rgb(221, 217, 217);
 }
 
-.expediente-container p{
+.expediente-container p {
   font-weight: 600;
 }
 
-.expediente-container a{
+.expediente-container a {
   text-decoration: none;
   background-color: gray;
   color: #fff;
@@ -379,14 +371,14 @@ p {
   margin-bottom: 20px;
 }
 
-.new-expediente-container{
+.new-expediente-container {
   margin-top: 100px;
   border: solid 1px black;
   padding: 30px;
   background-color: rgb(221, 217, 217);
 }
 
-.footer{
+.footer {
   margin-top: 50px;
   max-width: 100%;
   background-color: gray;
@@ -394,8 +386,7 @@ p {
   font-weight: 900;
 }
 
-
-.logout{
+.logout {
   text-decoration: none;
   background-color: #007bff;
   color: #fff;
@@ -406,6 +397,3 @@ p {
   max-width: 100px;
   margin-bottom: 20px;
 }
-
-
-

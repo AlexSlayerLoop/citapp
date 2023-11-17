@@ -21,39 +21,50 @@
         display: flex;
         flex-direction: column;
         background-color: lightblue;
+        gap: 50px;
       }
       .medico-container {
         margin-top: 38px;
         margin-bottom: 40px;
+      }
+      .info {
+        color: green;
+      }
+      .error {
+        color: red;
       }
     </style>
   </head>
 
   <body>
     <nav class="navbar navbar-expand-lg bg-light">
-      <a class="navbar-brand" href="#">Vital Health Care</a>
-      <!-- <div class="collapse navbar-collapse"> -->
+      <strong><a class="navbar-brand" href="#">Vital Health Care</a></strong>
       <ul class="navbar-nav ml-auto">
-        <!-- Hide the Login/Registration navigation for logged-in users -->
-
         <li class="nav-item">
           <a
             class="nav-link"
             href="{{ url_for('doctor_page', user=current_user.nombre) }}"
-            >{{ current_user.nombre }}</a
           >
+            Dr. {{ current_user.nombre }}
+          </a>
         </li>
+
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('mostrar_quejas') }}"
-            >Feedback</a
-          >
+          <a class="nav-link" href="{{ url_for('mostrar_quejas') }}">
+            Feedback
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('register_secretary_page') }}">
+            Agregar Asistente
+          </a>
         </li>
 
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('log_out') }}">Log Out</a>
         </li>
       </ul>
-      <!-- </div> -->
     </nav>
     {% block content %} {% endblock %}
   </body>
