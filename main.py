@@ -497,5 +497,46 @@ def mostrar_quejas():
     return render_template("mostrar_quejas.html", datos=rows)
 
 
+@app.route("/actualizar_horario", methods=["GET", "POST"])
+def horario_doctor():
+    if request.method == "POST":
+        get = request.form
+        horario_entrada = get["hora_entrada"]
+        horario_salida = get["hora_salida"]
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT COUNT(*) AS hay_horario FROM horario WHERE id_doctor = '{}'".format(
+                    current_user.id
+                )
+            )
+            resultado = cursor.fetchone()
+
+        if resultado["hay_horario"]:
+            with mysql.connect() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "UPDATE horario SET hora_entrada = '{}', hora_salida = '{}' WHERE id_doctor = '{}'".format(
+                        horario_entrada, horario_salida, current_user.id
+                    )
+                )
+                conn.commit()
+            flash("Horario actualizado exitosamente!", "info")
+            return redirect(url_for("horario_doctor"))
+
+        query = """INSERT INTO horario (hora_entrada, hora_salida, id_doctor) VALUES (%s, %s, %s)"""
+        values = (horario_entrada, horario_salida, current_user.id)
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, values)
+            conn.commit()
+
+        flash("Horario registrado exitosamente!", "info")
+        return redirect(url_for("horario_doctor"))
+    return render_template("set_schedule.html")
+
+
 if __name__ == "__main__":
     app.run()

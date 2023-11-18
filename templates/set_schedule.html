@@ -1,0 +1,42 @@
+{% extends "base_doctor.html" %} {% block title %}Horario{% endblock %} {% block
+content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %} 
+  {% if messages %} 
+    {% for category, message in messages %}
+      <h3 class="{{ category }}">{{ message }}</h3>
+    {% endfor %} 
+  {% endif %} 
+{% endwith %}
+
+<div class="page-containerIn">
+  <div class="login-container">
+    <form
+      action="{{ url_for('horario_doctor') }}"
+      method="post"
+      id="login-form"
+    >
+      <div class="form-group">
+        <label for="hora_entrada">Horario Entrada</label>
+        <input
+          type="time"
+          id="hora_entrada"
+          name="hora_entrada"
+          class="input-field"
+          required
+        />
+        <br /><br />
+        <label for="hora_salida">Horario Salida</label>
+        <input
+          type="time"
+          id="hora_salida"
+          name="hora_salida"
+          class="input-field"
+          required
+        />
+      </div>
+      <button type="submit" class="submit-button">Actualizar Horario</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
