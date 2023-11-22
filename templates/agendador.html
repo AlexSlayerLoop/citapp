@@ -1,46 +1,103 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Agendador de Citas</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <title>Agendador</title>
+    <!-- Agrega tus estilos CSS aquí -->
+    <style>
+      body {
+        background-color: lightblue;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="{{ url_for('user_page', user=current_user.nombre) }}">Inicio</a>
+      <a href="{{ url_for('agendador') }}">Agendar</a>
+      <a href="{{ url_for('register_patient_page') }}">Registar Paciente</a>
+      <a href="{{ url_for('quejas') }}">Quejas</a>
+    </nav>
 
-  <div class="containerall">
-  <!--nav class="navbar-Ag">
-    <!--a href="index.html">Inicio</a>
-    <!--a href="login.html">Inicio sesion</a>
-    <!--a href="register.html">Registrarse</a-->
-    <!--a href="agendador.html" class="active">Agendador</a-->
-  </nav>
-    
-    <div class="page-containerAgenda">
+    <div class="containerall">
+      <div class="page-containerAgenda">
         <div class="agenda-container">
-            <h1>Agendador de Citas</h1>
-            <form id="agenda-form">
-                <div class="form-group">
-                    <label for="nombre">Nombre</label>
-                    <input type="text" id="nombre" class="input-field" required>
-                </div>
-                <div class="form-group">
-                    <label for="fecha">Fecha</label>
-                    <input type="date" id="fecha" class="input-field" required>
-                </div>
-                <div class="form-group">
-                    <label for="hora">Hora</label>
-                    <input type="time" id="hora" class="input-field" required>
-                </div>
-            </form>
-          <form id="agenda-form" method="post" action="confirmacion.php">
-              <!-- Resto de tu formulario -->
-              <button type="submit" class="submit-button">Agendar Cita</button>
+          <h1>Agendador de Citas</h1>
+          <form
+            id="agenda-form"
+            action="{{ url_for('agendador') }}"
+            method="post"
+          >
+            <div class="form-group">
+              <label for="id_paciente">Cita para: </label>
+              <select
+                class="form-select"
+                id="id_paciente"
+                name="id_paciente"
+                required
+              >
+                {% for paciente in pacientes %}
+                <option value="{{ paciente['id'] }}">
+                  {{ paciente['nombre'] }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="fecha">Elige una fecha:</label>
+              <input
+                type="date"
+                id="fecha"
+                name="fecha"
+                min=""
+                class="input-field"
+                required
+              />
+            </div>
+            <button type="submit" class="submit-button">Buscar 🔎</button>
           </form>
-            <a href="/index.html">Volver a Inicio</a>
+
+          <script>
+            const dateInput = document.getElementById("fecha");
+
+            // Get the current date in the format "YYYY-MM-DD"
+            const currentDate = new Date().toISOString().split("T")[0];
+
+            // Set the min attribute of the date input to the current date
+            dateInput.min = currentDate;
+
+            // Function to check if a given date is a Saturday or Sunday
+            function isWeekend(date) {
+              const dayOfWeek = new Date(date).getDay();
+              return dayOfWeek === 6 || dayOfWeek === 5; // 6 is Sunday, 5 is Saturday
+            }
+
+            // Event listener to prevent selecting weekends
+            dateInput.addEventListener("input", function () {
+              if (isWeekend(this.value)) {
+                alert(
+                  "Por favor escoja un dia de la semana (Lunes a Viernes)."
+                );
+                this.value = ""; // Clear the selected date
+              }
+            });
+          </script>
+
+          <a href="{{ url_for('user_page', user=current_user.nombre) }}"
+            >Volver a Inicio</a
+          >
         </div>
-        
+      </div>
     </div>
-    </div>
-</body>
+  </body>
 </html>

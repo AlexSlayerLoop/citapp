@@ -18,6 +18,7 @@ from flask_login import (
 from flaskext.mysql import MySQL
 from pymysql.cursors import DictCursor
 from users import User, Doctor, Secretary
+from datetime import datetime, timedelta
 
 
 app = Flask(__name__)
@@ -151,7 +152,7 @@ def login_doctor_page():
         # revisar si el hash de la contraseña ingresa es igual que en la base de datos
         elif not check_password_hash(user["password"], password):
             flash("Contraseña incorrecta, por favor intente de nuevo.")
-            return redirect(url_for("login"))
+            return redirect(url_for("login_doctor_page"))
         else:
             new_user = Doctor(
                 id=user["id"],
@@ -268,7 +269,11 @@ def register_patient_page():
 
         with mysql.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) AS total FROM paciente")
+            cursor.execute(
+                "SELECT COUNT(*) AS total FROM paciente WHERE id_usuario = '{}'".format(
+                    current_user.id
+                )
+            )
             pacientes = cursor.fetchone()
 
         if pacientes["total"] >= 5:
@@ -420,9 +425,142 @@ def secretary_page(user):
     return render_template("secretary.html")
 
 
-@app.route("/agendador")
+@app.route("/agendador", methods=["GET", "POST"])
 def agendador():
-    return render_template("agendador.html")
+    if request.method == "POST":
+        id_paciente = request.form["id_paciente"]
+        fecha = request.form["fecha"]
+
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT nombre FROM paciente WHERE id = '{}'".format(id_paciente)
+            )
+            paciente = cursor.fetchone()
+
+        nombre_paciente = paciente["nombre"]
+
+        return redirect(
+            url_for(
+                "mostrar_citas_disponibles",
+                fecha=fecha,
+                id_paciente=id_paciente,
+                nombre_paciente=nombre_paciente,
+            )
+        )
+
+    query = """
+    SELECT 
+	    nombre, id 
+    FROM 
+        paciente
+    WHERE 
+        id NOT IN (
+            SELECT paciente.id
+            FROM paciente
+            INNER JOIN cita 
+            ON paciente.id = cita.id_paciente)
+        AND 
+            paciente.id_usuario = '{}'
+    """.format(
+        current_user.id
+    )
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        pacientes = cursor.fetchall()
+
+    return render_template("agendador.html", pacientes=pacientes)
+
+
+@app.route("/citas_disponibles", methods=["GET", "POST"])
+def mostrar_citas_disponibles():
+    if request.method == "POST":
+        # eval convierte del type string al diccionario py obtenido de el form
+        selected_row = request.form["selected_row"]
+        data = eval(selected_row)  # puedes obteenr nombre_doctor, id_doctor, hora
+
+        id_doctor = data["id_doctor"]
+        hora = data["hora_disponible"] * 10000
+        fecha = request.form["fecha"]  # podemos obtener fecha, id_paciente
+        id_paciente = request.form["id_paciente"]
+
+        query = """INSERT INTO cita (id_doctor, id_paciente, fecha, hora)
+                    VALUES (%s, %s, %s, %s)"""
+        values = (id_doctor, id_paciente, fecha, hora)
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, values)
+            conn.commit()
+
+        flash("Has agendado tu cita exitosamente! 👩‍⚕️", "info")
+        return redirect(url_for("user_page", user=current_user.nombre))
+
+    fecha = request.args.get("fecha")
+    id_paciente = request.args.get("id_paciente")
+    nombre_paciente = request.args.get("nombre_paciente")
+
+    query = """
+        SELECT doctor.nombre AS nombre_doctor, horario.id_doctor, horario.hora_entrada, horario.hora_salida
+        FROM doctor
+        INNER JOIN horario
+        ON doctor.id = horario.id_doctor
+    """
+
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        horarios_doctores = cursor.fetchall()
+
+    # modfica los campos hora entrada y hora salida a tipos enteros
+    for registro in horarios_doctores:
+        registro["hora_entrada"] = int(registro["hora_entrada"].total_seconds() // 3600)
+        registro["hora_salida"] = int(registro["hora_salida"].total_seconds() // 3600)
+
+    # agregar un nuevo campo al diccionario horarios doctores con una lista de horas disponibles
+    for registro in horarios_doctores:
+        registro["horas_disponibles"] = [
+            hora for hora in range(registro["hora_entrada"], registro["hora_salida"])
+        ]
+
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id_doctor, id_paciente, fecha, hora FROM cita WHERE fecha = '{}'".format(
+                fecha
+            )
+        )
+        citas = cursor.fetchall()
+
+    # limpiar la lista de horas disponibles con las citas agendadas
+    for registro in horarios_doctores:
+        for cita in citas:
+            if registro["id_doctor"] == cita["id_doctor"]:
+                num = int(cita["hora"].total_seconds() // 3600)
+                registro["horas_disponibles"].remove(num)
+
+    horas_agendables = []
+
+    for doctor in horarios_doctores:
+        for hora_disponible in doctor["horas_disponibles"]:
+            nuevo_elemento = {
+                "nombre_doctor": doctor["nombre_doctor"],
+                "id_doctor": doctor["id_doctor"],
+                "hora_disponible": hora_disponible,
+            }
+            horas_agendables.append(nuevo_elemento)
+
+    for item in horas_agendables:
+        print(item)
+
+    return render_template(
+        "tabla_citas.html",
+        horas_agendables=horas_agendables,
+        num_citas=len(horas_agendables),
+        fecha=fecha,
+        id_paciente=id_paciente,
+        nombre_paciente=nombre_paciente,
+    )
 
 
 @app.route("/quejas", methods=["GET", "POST"])
