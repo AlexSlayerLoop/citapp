@@ -423,6 +423,7 @@ def doctor_page(user):
 
 
 @app.route("/secretary/<user>")
+@login_required
 def secretary_page(user):
     for key, value in current_user.__dict__.items():
         print(f"{key}: {value}")
@@ -430,6 +431,7 @@ def secretary_page(user):
 
 
 @app.route("/agendador", methods=["GET", "POST"])
+@login_required
 def agendador():
     if request.method == "POST":
         id_paciente = request.form["id_paciente"]
@@ -478,6 +480,7 @@ def agendador():
 
 
 @app.route("/citas_disponibles", methods=["GET", "POST"])
+@login_required
 def mostrar_citas_disponibles():
     if request.method == "POST":
         # eval convierte del type string al diccionario py obtenido de el form
@@ -629,6 +632,7 @@ def quejas():
 
 
 @app.route("/ver_quejas")
+@login_required
 def mostrar_quejas():
     query = """SELECT nombre, comentario, evaluacion
                 FROM feedback
@@ -640,12 +644,11 @@ def mostrar_quejas():
         cursor.execute(query)
         rows = cursor.fetchall()
 
-    print(rows)
-
     return render_template("mostrar_quejas.html", datos=rows)
 
 
 @app.route("/actualizar_horario", methods=["GET", "POST"])
+@login_required
 def horario_doctor():
     if request.method == "POST":
         get = request.form
@@ -684,6 +687,44 @@ def horario_doctor():
         flash("Horario registrado exitosamente!", "info")
         return redirect(url_for("horario_doctor"))
     return render_template("set_schedule.html")
+
+
+@app.route("/citas")
+@login_required
+def ver_citas():
+    query = """ SELECT nombre, fecha, DATE_FORMAT(hora, '%H:%i') as hora
+                FROM cita
+                INNER JOIN paciente ON paciente.id = cita.id_paciente
+                WHERE id_doctor = '{}'
+                ORDER BY fecha, hora DESC """.format(
+        current_user.id
+    )
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        datos = cursor.fetchall()
+    return render_template("ver_citas.html", datos=datos)
+
+
+@app.route("/eliminar/cita")
+@login_required
+def eliminar_cita():
+    fecha = request.args.get("fecha")
+    hora = request.args.get("hora")
+
+    query = """DELETE FROM cita 
+               WHERE id_doctor = %s
+               AND fecha = %s
+               AND hora = %s
+            """
+    values = (current_user.id, fecha, hora)
+
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query, values)
+        conn.commit()
+
+    return redirect(url_for("ver_citas"))
 
 
 if __name__ == "__main__":
