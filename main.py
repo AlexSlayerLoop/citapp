@@ -18,12 +18,16 @@ from flask_login import (
 from flaskext.mysql import MySQL
 from pymysql.cursors import DictCursor
 from users import User, Doctor, Secretary
-from datetime import datetime, timedelta
+from twilio.rest import Client
+from config import TwilioConfig
 
 
 app = Flask(__name__)
 # importar mis configuraciones
 app.config.from_object("config.Config")
+# account_sid = "ACacd17ba9385ecaaa6a45c52d61c95f69"
+# auth_token = "d6661215c29050ee66fd89c7f44f8aa0"
+client = Client(TwilioConfig.ACCOUNT_SID, TwilioConfig.AUTH_TOKEN)
 
 # inicial la conexion con mysql
 mysql = MySQL(app, cursorclass=DictCursor)
@@ -481,6 +485,7 @@ def mostrar_citas_disponibles():
         data = eval(selected_row)  # puedes obteenr nombre_doctor, id_doctor, hora
 
         id_doctor = data["id_doctor"]
+        nombre_doctor = data["nombre_doctor"]
         hora = data["hora_disponible"] * 10000
         fecha = request.form["fecha"]  # podemos obtener fecha, id_paciente
         id_paciente = request.form["id_paciente"]
@@ -494,6 +499,11 @@ def mostrar_citas_disponibles():
             conn.commit()
 
         flash("Has agendado tu cita exitosamente! 👩‍⚕️", "info")
+        mensaje = client.messages.create(
+            from_="+13394692386",
+            body=f"Tu cita ha sido registrada con fecha: {fecha} a las {hora // 10000}:00 horas, con el Dr. {nombre_doctor}",
+            to=f"+52{current_user.telefono}",
+        )
         return redirect(url_for("user_page", user=current_user.nombre))
 
     fecha = request.args.get("fecha")
