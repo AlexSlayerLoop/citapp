@@ -8,6 +8,7 @@ from flask import (
     send_from_directory,
 )
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from flask_login import (
     login_user,
     LoginManager,
@@ -20,13 +21,19 @@ from pymysql.cursors import DictCursor
 from users import User, Doctor, Secretary
 from twilio.rest import Client
 from config import TwilioConfig
+import os
 
+ALLOWED_EXTENSIONS = {"pdf", "png", "jpg", "jpeg"}
 
 app = Flask(__name__)
+
 # importar mis configuraciones
 app.config.from_object("config.Config")
-# account_sid = "ACacd17ba9385ecaaa6a45c52d61c95f69"
-# auth_token = "d6661215c29050ee66fd89c7f44f8aa0"
+
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
 client = Client(TwilioConfig.ACCOUNT_SID, TwilioConfig.AUTH_TOKEN)
 
 # inicial la conexion con mysql
@@ -454,25 +461,23 @@ def agendador():
                 nombre_paciente=nombre_paciente,
             )
         )
-
-    query = """
-    SELECT 
-	    nombre, id 
-    FROM 
-        paciente
-    WHERE 
-        id NOT IN (
+    # BORRAR LAS CITAS CADUCADAS PARA PODER AGENDAR NUEVAS
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM cita WHERE fecha < CURDATE()")
+        conn.commit()
+    
+        query = """
+        SELECT nombre, id 
+        FROM paciente
+        WHERE id NOT IN (
             SELECT paciente.id
             FROM paciente
             INNER JOIN cita 
             ON paciente.id = cita.id_paciente)
-        AND 
-            paciente.id_usuario = '{}'
-    """.format(
-        current_user.id
-    )
-    with mysql.connect() as conn:
-        cursor = conn.cursor()
+        AND paciente.id_usuario = '{}'
+        """.format(current_user.id)
+    
         cursor.execute(query)
         pacientes = cursor.fetchall()
 
@@ -504,7 +509,7 @@ def mostrar_citas_disponibles():
         flash("Has agendado tu cita exitosamente! 👩‍⚕️", "info")
         mensaje = client.messages.create(
             from_="+13394692386",
-            body=f"Tu cita ha sido registrada con fecha: {fecha} a las {hora // 10000}:00 horas, con el Dr. {nombre_doctor}",
+            body=f"VITAL HEALTH CARE\nTu cita ha sido registrada con fecha: {fecha} a las {hora // 10000}:00 horas, con el Dr. {nombre_doctor}",
             to=f"+52{current_user.telefono}",
         )
         return redirect(url_for("user_page", user=current_user.nombre))
@@ -696,9 +701,8 @@ def ver_citas():
                 FROM cita
                 INNER JOIN paciente ON paciente.id = cita.id_paciente
                 WHERE id_doctor = '{}'
-                ORDER BY fecha, hora DESC """.format(
-        current_user.id
-    )
+                ORDER BY fecha, hora DESC """.format(current_user.id)
+                
     with mysql.connect() as conn:
         cursor = conn.cursor()
         cursor.execute(query)
@@ -725,6 +729,66 @@ def eliminar_cita():
         conn.commit()
 
     return redirect(url_for("ver_citas"))
+
+
+@app.route("/subir_estudios", methods=["GET", "POST"])
+def upload_files():
+    if request.method == "POST":
+        id_paciente = request.form['id_paciente']
+        nombre_estudio = request.form['nombre_estudio']
+        
+         # check if the post request has the file part
+        if "file" not in request.files:
+            flash("No file part")
+            return redirect(request.url)
+        file = request.files['file']
+        
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == "":
+            flash("No selected file")
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            
+            # debemos crear carpeta para cada paciente
+            directorio = os.path.join(".", "uploads", f"{id_paciente}")
+            if not os.path.exists(directorio):
+                os.makedirs(directorio)
+                
+            path = '/'.join([app.config['UPLOAD_FOLDER'], id_paciente, filename])
+            
+            file.save(path)  # save the file 
+            
+            with mysql.connect() as conn: # registrar en la base de datos la ruta de los archivos para cada paciente
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM estudios_medicos WHERE id_paciente = {} AND url_estudio = '{}'".format(id_paciente, path))
+                estudio_medico = cursor.fetchone()
+                
+                if not estudio_medico:
+                    cursor.execute("""INSERT INTO estudios_medicos (id_paciente, nombre_estudio, url_estudio)
+                                    VALUES ({}, '{}', '{}')""".format(id_paciente, nombre_estudio, path))
+                    conn.commit()
+        
+            return redirect(url_for("download_file", name=filename, id_paciente=id_paciente))
+        
+    query = """SELECT paciente.id AS id_paciente, paciente.nombre AS paciente, paciente.fecha_nacimiento, usuario.correo
+               FROM paciente
+               INNER JOIN usuario
+               ON paciente.id_usuario = usuario.id
+               ORDER BY paciente.nombre"""
+    
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        datos = cursor.fetchall()
+
+    return render_template("subir_estudios.html", pacientes = datos)
+
+
+@app.route("/uploads/<id_paciente>/<name>")
+def download_file(name, id_paciente):
+    return send_from_directory(os.path.join(app.config["UPLOAD_FOLDER"], f'{id_paciente}'), name)
 
 
 if __name__ == "__main__":

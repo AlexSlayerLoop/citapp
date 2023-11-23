@@ -1,35 +1,39 @@
-{% extends "base_doctor.html" %}
-{% block title %}Citas{% endblock %}
-
-{% block content %}
+{% extends "base_doctor.html" %} {% block title %}Citas{% endblock %} {% block
+content %}
 <body>
-    <div class="container">
-        <h1>Citas Proximas</h1>
+  <div class="container">
+    <h1>Citas Proximas</h1>
 
-        <table class="table table-light table-striped table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">Paciente</th>
-                    <th scope="col">Fecha</th>
-                    <th scope="col">Hora</th>
-                    <th scope="col">Eliminar</th>
-                </tr>
-            </thead>
+    <table class="table table-light table-striped table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Paciente</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Hora</th>
+          <th scope="col">Eliminar</th>
+        </tr>
+      </thead>
 
-            {% for row in datos %}
-            <tr>
-                {% for item in row.values() %}
-                <td>{{ item }}</td>
-                {% endfor %}
-                <td>
-                    <a href="{{ url_for('eliminar_cita', fecha=row['fecha'], hora=row['hora']) }}">
-                        <img style="width: 20px" src="{{ url_for('static', filename='images/trash.png') }}" alt="trash can">
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+      {% for row in datos %}
+      <tr>
+        {% for item in row.values() %}
+        <td>{{ item }}</td>
+        {% endfor %}
+        <td>
+          <a
+            href="{{ url_for('eliminar_cita', fecha=row['fecha'], hora=row['hora']) }}"
+          >
+            <img
+              style="width: 20px"
+              src="{{ url_for('static', filename='images/trash.png') }}"
+              alt="trash can"
+            />
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
 </body>
-</html>
+
 {% endblock %}
