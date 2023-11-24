@@ -34,6 +34,7 @@ app.config.from_object("config.Config")
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
 client = Client(TwilioConfig.ACCOUNT_SID, TwilioConfig.AUTH_TOKEN)
 
 # inicial la conexion con mysql
@@ -464,9 +465,11 @@ def agendador():
     # BORRAR LAS CITAS CADUCADAS PARA PODER AGENDAR NUEVAS
     with mysql.connect() as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM cita WHERE fecha < CURDATE()") # TODO change this query to save this info in historial cita
+        cursor.execute(
+            "DELETE FROM cita WHERE fecha < CURDATE()"
+        )  # TODO change this query to save this info in historial cita
         conn.commit()
-    
+
         query = """
         SELECT nombre, id 
         FROM paciente
@@ -476,8 +479,10 @@ def agendador():
             INNER JOIN cita 
             ON paciente.id = cita.id_paciente)
         AND paciente.id_usuario = '{}'
-        """.format(current_user.id)
-    
+        """.format(
+            current_user.id
+        )
+
         cursor.execute(query)
         pacientes = cursor.fetchall()
 
@@ -697,12 +702,14 @@ def horario_doctor():
 @app.route("/citas")
 @login_required
 def ver_citas():
-    query = """ SELECT nombre, fecha, DATE_FORMAT(hora, '%H:%i') as hora
+    query = """ SELECT nombre, fecha, DATE_FORMAT(hora, '%H:%i') AS hora
                 FROM cita
                 INNER JOIN paciente ON paciente.id = cita.id_paciente
                 WHERE id_doctor = '{}'
-                ORDER BY fecha, hora DESC """.format(current_user.id)
-                
+                ORDER BY fecha, hora""".format(
+        current_user.id
+    )
+
     with mysql.connect() as conn:
         cursor = conn.cursor()
         cursor.execute(query)
@@ -734,15 +741,15 @@ def eliminar_cita():
 @app.route("/subir_estudios", methods=["GET", "POST"])
 def upload_files():
     if request.method == "POST":
-        id_paciente = request.form['id_paciente']
-        nombre_estudio = request.form['nombre_estudio']
-        
-         # check if the post request has the file part
+        id_paciente = request.form["id_paciente"]
+        nombre_estudio = request.form["nombre_estudio"]
+
+        # check if the post request has the file part
         if "file" not in request.files:
             flash("No file part")
             return redirect(request.url)
-        file = request.files['file']
-        
+        file = request.files["file"]
+
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file.filename == "":
@@ -750,50 +757,87 @@ def upload_files():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            
+
             # debemos crear carpeta para cada paciente
             directorio = os.path.join(".", "uploads", f"{id_paciente}")
             if not os.path.exists(directorio):
                 os.makedirs(directorio)
-                
-            path = '/'.join([app.config['UPLOAD_FOLDER'], id_paciente, filename])
-            
-            file.save(path)  # save the file 
-            
-            with mysql.connect() as conn: # registrar en la base de datos la ruta de los archivos para cada paciente
+
+            path = "/".join([app.config["UPLOAD_FOLDER"], id_paciente, filename])
+
+            file.save(path)  # save the file
+
+            with mysql.connect() as conn:  # registrar en la base de datos la ruta de los archivos para cada paciente
                 cursor = conn.cursor()
-                cursor.execute("SELECT * FROM estudios_medicos WHERE id_paciente = {} AND url_estudio = '{}'".format(id_paciente, path))
+                cursor.execute(
+                    "SELECT * FROM estudios_medicos WHERE id_paciente = {} AND url_estudio = '{}'".format(
+                        id_paciente, path
+                    )
+                )
                 estudio_medico = cursor.fetchone()
-                
+
                 if not estudio_medico:
-                    cursor.execute("""INSERT INTO estudios_medicos (id_paciente, nombre_estudio, url_estudio)
-                                    VALUES ({}, '{}', '{}')""".format(id_paciente, nombre_estudio, path))
+                    cursor.execute(
+                        """INSERT INTO estudios_medicos (id_paciente, nombre_estudio, url_estudio)
+                                    VALUES ({}, '{}', '{}')""".format(
+                            id_paciente, nombre_estudio, path
+                        )
+                    )
                     conn.commit()
-        
-            return redirect(url_for("download_file", name=filename, id_paciente=id_paciente))
-        
+
+            return redirect(
+                url_for("download_file", name=filename, id_paciente=id_paciente)
+            )
+
     query = """SELECT paciente.id AS id_paciente, paciente.nombre AS paciente, paciente.fecha_nacimiento, usuario.correo
                FROM paciente
                INNER JOIN usuario
                ON paciente.id_usuario = usuario.id
                ORDER BY paciente.nombre"""
-    
+
     with mysql.connect() as conn:
         cursor = conn.cursor()
         cursor.execute(query)
         datos = cursor.fetchall()
 
-    return render_template("subir_estudios.html", pacientes = datos)
+    return render_template("subir_estudios.html", pacientes=datos)
 
 
 @app.route("/uploads/<id_paciente>/<name>")
 def download_file(name, id_paciente):
-    return send_from_directory(os.path.join(app.config["UPLOAD_FOLDER"], f'{id_paciente}'), name)
+    return send_from_directory(
+        os.path.join(app.config["UPLOAD_FOLDER"], f"{id_paciente}"), name
+    )
 
-@app.route('/expediente/formularios')
+
+@app.route("/expediente/formularios")
 def exp_forms():
-    
     return render_template("expediente_forms.html")
+
+
+@app.route("/mostrar/pacientes", methods=["GET", "POST"])
+def mostrar_pacientes():
+    if request.method == "POST":
+        paciente_buscado = request.form["buscador"]
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """SELECT id AS id_paciente, nombre, fecha_nacimiento 
+                FROM paciente 
+                WHERE nombre LIKE '%{}%'""".format(paciente_buscado)
+            )
+            pacientes = cursor.fetchall()
+        return render_template("mostrar_pacientes.html", pacientes=pacientes, length=len(pacientes))
+    
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id AS id_paciente, nombre, fecha_nacimiento FROM paciente"
+        )
+        pacientes = cursor.fetchall()
+
+    return render_template("mostrar_pacientes.html", pacientes=pacientes, length=len(pacientes))
+
 
 if __name__ == "__main__":
     app.run()

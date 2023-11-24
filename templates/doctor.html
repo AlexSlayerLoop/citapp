@@ -10,11 +10,16 @@ block content %}
     <h1>Bienvenido Dr: {{ current_user.nombre }}</h1>
 
     <!-- Formulario de búsqueda de pacientes -->
-    <form id="search-form">
+    <form
+      id="search-form"
+      class="text-center"
+      method="post"
+      action="{{ url_for('mostrar_pacientes') }}"
+    >
       <input
-        class="input-field"
         type="text"
-        id="search-input"
+        class="input-field"
+        name="buscador"
         placeholder="Buscar paciente por nombre"
       />
       <button type="submit" class="submit-button">Buscar</button>
