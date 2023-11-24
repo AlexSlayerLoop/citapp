@@ -512,11 +512,15 @@ def mostrar_citas_disponibles():
             conn.commit()
 
         flash("Has agendado tu cita exitosamente! 👩‍⚕️", "info")
-        mensaje = client.messages.create(
-            from_="+13394692386",
-            body=f"VITAL HEALTH CARE\nTu cita ha sido registrada con fecha: {fecha} a las {hora // 10000}:00 horas, con el Dr. {nombre_doctor}",
-            to=f"+52{current_user.telefono}",
-        )
+        try:
+            mensaje = client.messages.create(
+                from_="+13394692386",
+                body=f"VITAL HEALTH CARE\nTu cita ha sido registrada con fecha: {fecha} a las {hora // 10000}:00 horas, con el Dr. {nombre_doctor}",
+                to=f"+52{current_user.telefono}",
+            )
+        except Exception as e:
+            print(f"An Error ocurred {e}")
+        
         return redirect(url_for("user_page", user=current_user.nombre))
 
     fecha = request.args.get("fecha")
