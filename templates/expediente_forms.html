@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <style>
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px; /* Adjust the gap between grid cells */
+        padding: 20px;
+      }
+      body {
+        background-color: lightblue;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 50px;
+      }
+      /*
+      form {
+        border: 1px solid #ccc;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      } */
+    </style>
+    <title>Grid of Forms</title>
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="#">Regresar 🔙</a>
+    </nav>
+    <div class="grid">
+      <div class="agenda-container">
+        <h1>Alergia</h1>
+        <form>
+          <input
+            type="text"
+            id=" nombre_alergia"
+            name=" nombre_alergia"
+            placeholder="nombre alergia"
+            class="input-field"
+            required="required"
+            maxlength="255"
+          /><br /><br />
+          <button type="submit" class="submit-button">Enviar</button>
+        </form>
+      </div>
+
+      <div class="agenda-container">
+        <h1>Enfermedades Cronicas</h1>
+        <form>
+          <input
+            type="text"
+            id="nombre_enfermedad"
+            name="nombre_enfermedad"
+            placeholder="Nombre de la enfermedad"
+            class="input-field"
+            required="required"
+            maxlength="255"
+          /><br /><br />
+          <button type="submit" class="submit-button">Enviar</button>
+        </form>
+      </div>
+
+      <div class="agenda-container">
+        <h1>Historial Cirugias</h1>
+        <form>
+          <input
+            type="text"
+            id="nombre_cirugia"
+            name="nombre_cirugia"
+            placeholder="Nombre de la cirugia"
+            class="input-field"
+            required="required"
+            maxlength="255"
+          />
+          <br /><br />
+          <label for="fecha">Fecha</label><br />
+          <input
+            type="date"
+            id="fecha"
+            name="fecha"
+            class="input-field"
+            placeholder="Fecha"
+            required="required"
+          />
+          <br /><br />
+          <button type="submit" class="submit-button">Enviar</button>
+        </form>
+      </div>
+
+      <div class="agenda-container">
+        <h1>Medicamento</h1>
+        <form>
+          <input
+            type="text"
+            name="nombre_medicamento"
+            placeholder="Nombre del medicamento"
+            class="input-field"
+            required="required"
+            maxlength="255"
+          /><br /><br />
+          <input
+            type="number"
+            name="duracion"
+            min="1"
+            step="1"
+            placeholder="Duracion del medicamento (dias)"
+            class="input-field"
+            required="required"
+          /><br /><br />
+          <input
+            type="number"
+            name="frecuencia"
+            min="1"
+            step="1"
+            placeholder="Frecuencia medicamento (horas)"
+            class="input-field"
+            required="required"
+          /><br /><br />
+
+          <button type="submit" class="submit-button">Enviar</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

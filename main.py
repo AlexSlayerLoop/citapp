@@ -464,7 +464,7 @@ def agendador():
     # BORRAR LAS CITAS CADUCADAS PARA PODER AGENDAR NUEVAS
     with mysql.connect() as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM cita WHERE fecha < CURDATE()")
+        cursor.execute("DELETE FROM cita WHERE fecha < CURDATE()") # TODO change this query to save this info in historial cita
         conn.commit()
     
         query = """
@@ -790,6 +790,10 @@ def upload_files():
 def download_file(name, id_paciente):
     return send_from_directory(os.path.join(app.config["UPLOAD_FOLDER"], f'{id_paciente}'), name)
 
+@app.route('/expediente/formularios')
+def exp_forms():
+    
+    return render_template("expediente_forms.html")
 
 if __name__ == "__main__":
     app.run()
