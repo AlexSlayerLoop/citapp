@@ -6,6 +6,7 @@ from flask import (
     redirect,
     flash,
     send_from_directory,
+    abort
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -743,6 +744,7 @@ def eliminar_cita():
 
 
 @app.route("/subir_estudios", methods=["GET", "POST"])
+@login_required
 def upload_files():
     if request.method == "POST":
         id_paciente = request.form["id_paciente"]
@@ -808,18 +810,60 @@ def upload_files():
 
 
 @app.route("/uploads/<id_paciente>/<name>")
+@login_required
 def download_file(name, id_paciente):
     return send_from_directory(
         os.path.join(app.config["UPLOAD_FOLDER"], f"{id_paciente}"), name
     )
 
 
-@app.route("/expediente/formularios")
-def exp_forms():
-    return render_template("expediente_forms.html")
+@app.route("/expediente/formularios", methods=["GET", "POST"])
+@login_required
+def expediente_forms():
+    if request.method == "POST":
+        get = request.form
+
+        if "nombre_alergia" in get.keys():
+            query = """INSERT INTO alergia (id_paciente, nombre_alergia)
+                        VALUES (%s, %s)"""    
+            values = (get.get("id_paciente"), get.get("nombre_alergia"))
+            
+                
+        elif "nombre_enfermedad" in get.keys():
+            query = """INSERT INTO enfermedades_cronicas (id_paciente, nombre_enfermedad)
+                        VALUES (%s, %s)"""       
+            values = (get.get("id_paciente"), get.get("nombre_enfermedad"))
+            
+                
+        elif "nombre_cirugia" in get.keys():
+            query = """INSERT INTO historial_cirugias (id_paciente, nombre_cirugia, fecha)
+                        VALUES (%s, %s, %s)"""
+            values = (get.get("id_paciente"), get.get("nombre_cirugia"), get.get("fecha"))
+                
+        elif "nombre_medicamento" in get.keys():
+            query = """INSERT INTO medicamentos_actuales 
+                        (id_paciente, nombre_medicamento, duracion_tratamiento, frecuencia)
+                        VALUES (%s, %s, %s, %s)"""
+            values = (
+                get.get("id_paciente"), 
+                get.get("nombre_medicamento"), 
+                get.get("duracion_tratamiento"),
+                get.get("frecuencia")
+            )
+        
+        with mysql.connect() as conn:
+                cursor = conn.cursor()
+                cursor.execute(query, values)
+                conn.commit()
+        flash("sus datos han sido insertados con exito")
+        return redirect(url_for("mostrar_pacientes"))  
+    
+    id_paciente = request.args.get('id_paciente')
+    return render_template("expediente_forms.html", id_paciente=id_paciente)
 
 
 @app.route("/mostrar/pacientes", methods=["GET", "POST"])
+@login_required
 def mostrar_pacientes():
     if request.method == "POST":
         paciente_buscado = request.form["buscador"]
@@ -841,6 +885,44 @@ def mostrar_pacientes():
         pacientes = cursor.fetchall()
 
     return render_template("mostrar_pacientes.html", pacientes=pacientes, length=len(pacientes))
+
+
+@app.route('/expediente', methods=["POST"])
+@login_required
+def mostrar_expediente():
+    if request.method == "POST":
+    
+        id_paciente = request.form['id_selected']
+        
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            
+            cursor.execute("SELECT nombre_alergia FROM alergia WHERE id_paciente = {}".format(id_paciente))
+            alergias = cursor.fetchall()
+            cursor.execute("SELECT * FROM historial_cirugias WHERE id_paciente = {}".format(id_paciente))
+            historial_cirugias = cursor.fetchall()
+            cursor.execute("SELECT * FROM medicamentos_actuales WHERE id_paciente = {}".format(id_paciente))
+            medicamentos_actuales = cursor.fetchall()
+            cursor.execute("SELECT * FROM enfermedades_cronicas WHERE id_paciente = {}".format(id_paciente))
+            enfermedades_cronicas = cursor.fetchall()
+            cursor.execute("SELECT * FROM paciente WHERE id = {}".format(id_paciente))
+            paciente = cursor.fetchone()
+            
+        return render_template(
+            "mostrar_expediente.html", 
+            paciente=paciente,
+            alergias=alergias, 
+            historial_cirugias=historial_cirugias, 
+            medicamentos_actuales=medicamentos_actuales, 
+            enfermedades_cronicas=enfermedades_cronicas
+        )
+    
+    abort(404)
+        
+    
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('page_not_found.html'), 404
 
 
 if __name__ == "__main__":

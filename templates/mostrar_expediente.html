@@ -1,0 +1,138 @@
+{% extends "base_doctor.html" %} {% block title %}Expediente{% endblock title %}
+{% block content %}
+
+<h1 style="font-size: 2.5rem" class="text-center">
+  Expediente<span>
+    <a
+      class="btn btn-dark"
+      href="{{ url_for('expediente_forms', id_paciente=paciente['id']) }}"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="currentColor"
+        class="bi bi-plus-circle"
+        viewBox="0 0 16 16"
+      >
+        <path
+          d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"
+        ></path>
+        <path
+          d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"
+        ></path>
+      </svg>
+      agregar
+    </a>
+  </span>
+</h1>
+
+<div class="container">
+  <h1>Datos paciente</h1>
+  <table class="table table-light table-striped table-hover">
+    <tr>
+      <th>Nombre</th>
+      <td>{{ paciente["nombre"] }}</td>
+    </tr>
+    <tr>
+      <th>Fecha de Nacimiento</th>
+      <td>{{ paciente["fecha_nacimiento"] }}</td>
+    </tr>
+    <tr>
+      <th>Sexo</th>
+      <td>{{ paciente["genero"] }}</td>
+    </tr>
+    <tr>
+      <th>Domicilio</th>
+      <td>{{ paciente['direccion'] }}</td>
+    </tr>
+    <tr>
+      <th>Peso</th>
+      <td>{{ paciente["peso_kg"] }} kg</td>
+    </tr>
+    <tr>
+      <th>Estatura</th>
+      <td>{{ paciente["estatura_mts"] }} m</td>
+    </tr>
+    <tr>
+      <th>Relacion con el usuario</th>
+      <td>{{ paciente["relacion"] }}</td>
+    </tr>
+  </table>
+</div>
+
+<div class="container">
+  <h1>Alergias</h1>
+  <table class="table table-light table-striped table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Tipo de alergia</th>
+      </tr>
+    </thead>
+
+    {% for row in alergias %}
+    <tr>
+      <td>{{ row['nombre_alergia'] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="container">
+  <h1>Historial Cirugias</h1>
+  <table class="table table-light table-striped table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Tipo de cirugia</th>
+        <th scope="col">Fecha</th>
+      </tr>
+    </thead>
+
+    {% for row in historial_cirugias %}
+    <tr>
+      <td>{{ row['nombre_cirugia'] }}</td>
+      <td>{{ row['fecha'] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="container">
+  <h1>Medicamentos Actuales</h1>
+  <table class="table table-light table-striped table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Nombre de Medicamento</th>
+        <th scope="col">Duracion tratamiento (dias)</th>
+        <th scope="col">Frecuencia de toma (horas)</th>
+      </tr>
+    </thead>
+
+    {% for row in medicamentos_actuales %}
+    <tr>
+      <td>{{ row['nombre_medicamento'] }}</td>
+      <td>{{ row['duracion_tratamiento'] }}</td>
+      <td>{{ row['frecuencia'] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="container">
+  <h1>Enfermedades Crónicas</h1>
+  <table class="table table-light table-striped table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Enfermedad</th>
+      </tr>
+    </thead>
+
+    {% for row in enfermedades_cronicas %}
+    <tr>
+      <td>{{ row['nombre_enfermedad'] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+{% endblock content %}

@@ -38,11 +38,16 @@
     <div class="grid">
       <div class="agenda-container">
         <h1>Alergia</h1>
-        <form>
+        <form method="post" action="{{ url_for('expediente_forms') }}">
+          <input
+            type="hidden"
+            id="id_paciente"
+            name="id_paciente"
+            value="{{ id_paciente }}"
+          />
           <input
             type="text"
-            id=" nombre_alergia"
-            name=" nombre_alergia"
+            name="nombre_alergia"
             placeholder="nombre alergia"
             class="input-field"
             required="required"
@@ -54,7 +59,13 @@
 
       <div class="agenda-container">
         <h1>Enfermedades Cronicas</h1>
-        <form>
+        <form method="post" action="{{ url_for('expediente_forms') }}">
+          <input
+            type="hidden"
+            id="id_paciente"
+            name="id_paciente"
+            value="{{ id_paciente }}"
+          />
           <input
             type="text"
             id="nombre_enfermedad"
@@ -70,7 +81,13 @@
 
       <div class="agenda-container">
         <h1>Historial Cirugias</h1>
-        <form>
+        <form method="post" action="{{ url_for('expediente_forms') }}">
+          <input
+            type="hidden"
+            id="id_paciente"
+            name="id_paciente"
+            value="{{ id_paciente }}"
+          />
           <input
             type="text"
             id="nombre_cirugia"
@@ -97,7 +114,13 @@
 
       <div class="agenda-container">
         <h1>Medicamento</h1>
-        <form>
+        <form method="post" action="{{ url_for('expediente_forms') }}">
+          <input
+            type="hidden"
+            id="id_paciente"
+            name="id_paciente"
+            value="{{ id_paciente }}"
+          />
           <input
             type="text"
             name="nombre_medicamento"
