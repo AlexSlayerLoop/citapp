@@ -135,4 +135,27 @@
   </table>
 </div>
 
+<div class="container">
+  <h1>Estudios Medicos</h1>
+  <table class="table table-light table-striped table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Nombre del estudio</th>
+      </tr>
+    </thead>
+
+    {% for row in estudios_medicos %}
+    <tr>
+      <td>
+        <a
+          href="{{ url_for('download_file', name=row['url_estudio'], id_paciente=row['id_paciente']) }}"
+          target="_blank"
+          >{{ row['nombre_estudio'] }}</a
+        >
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
 {% endblock content %}

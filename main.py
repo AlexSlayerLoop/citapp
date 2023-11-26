@@ -790,7 +790,7 @@ def upload_files():
                     cursor.execute(
                         """INSERT INTO estudios_medicos (id_paciente, nombre_estudio, url_estudio)
                                     VALUES ({}, '{}', '{}')""".format(
-                            id_paciente, nombre_estudio, path
+                            id_paciente, nombre_estudio, filename
                         )
                     )
                     conn.commit()
@@ -831,13 +831,11 @@ def expediente_forms():
             query = """INSERT INTO alergia (id_paciente, nombre_alergia)
                         VALUES (%s, %s)"""    
             values = (get.get("id_paciente"), get.get("nombre_alergia"))
-            
-                
+        
         elif "nombre_enfermedad" in get.keys():
             query = """INSERT INTO enfermedades_cronicas (id_paciente, nombre_enfermedad)
                         VALUES (%s, %s)"""       
             values = (get.get("id_paciente"), get.get("nombre_enfermedad"))
-            
                 
         elif "nombre_cirugia" in get.keys():
             query = """INSERT INTO historial_cirugias (id_paciente, nombre_cirugia, fecha)
@@ -910,6 +908,8 @@ def mostrar_expediente():
             medicamentos_actuales = cursor.fetchall()
             cursor.execute("SELECT * FROM enfermedades_cronicas WHERE id_paciente = {}".format(id_paciente))
             enfermedades_cronicas = cursor.fetchall()
+            cursor.execute("SELECT * FROM estudios_medicos WHERE id_paciente = {}".format(id_paciente))
+            estudios_medicos = cursor.fetchall()
             cursor.execute("SELECT * FROM paciente WHERE id = {}".format(id_paciente))
             paciente = cursor.fetchone()
             
@@ -919,7 +919,8 @@ def mostrar_expediente():
             alergias=alergias, 
             historial_cirugias=historial_cirugias, 
             medicamentos_actuales=medicamentos_actuales, 
-            enfermedades_cronicas=enfermedades_cronicas
+            enfermedades_cronicas=enfermedades_cronicas,
+            estudios_medicos=estudios_medicos
         )
     
     abort(404)
