@@ -417,7 +417,25 @@ def register_doctor_page():
 @app.route("/user/<user>")
 @login_required
 def user_page(user):
-    return render_template("user.html", current_user=current_user)
+    
+    query = """
+    SELECT paciente.nombre, fecha, hora
+    FROM paciente
+    INNER JOIN historial_cita
+    ON historial_cita.id_paciente = paciente.id
+    WHERE historial_cita.id_paciente
+        IN (SELECT paciente.id FROM paciente
+            INNER JOIN usuario
+            ON usuario.id = paciente.id_usuario
+            WHERE usuario.id = '{}')
+    """.format(current_user.id)
+    
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        historial_citas = cursor.fetchall()
+        
+    return render_template("user.html", current_user=current_user, historial_citas=historial_citas)
 
 
 @app.route("/doctor/<user>")
@@ -467,12 +485,17 @@ def agendador():
                 nombre_paciente=nombre_paciente,
             )
         )
-    # BORRAR LAS CITAS CADUCADAS PARA PODER AGENDAR NUEVAS
+    # TRANSFIERA LAS CITAS CADUCADAS AL HISTORIAL PARA PODER AGENDAR NUEVAS
     with mysql.connect() as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "DELETE FROM cita WHERE fecha < CURDATE()"
-        )  # TODO change this query to save this info in historial cita
+            """INSERT INTO historial_cita (id_doctor, id_paciente, fecha, hora)
+            SELECT id_doctor, id_paciente, fecha, hora
+            FROM cita
+            WHERE fecha < CURDATE()"""
+        )  
+        conn.commit()
+        cursor.execute("DELETE FROM cita WHERE fecha < CURDATE()")
         conn.commit()
 
         query = """

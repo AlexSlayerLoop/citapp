@@ -63,5 +63,26 @@
         </tr>
       </table>
     </div>
+
+    <div class="container">
+      <h1>Historial Citas</h1>
+      <table class="table table-light table-striped table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Paciente</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Hora</th>
+          </tr>
+        </thead>
+
+        {% for row in historial_citas %}
+        <tr>
+          <td>{{ row['nombre'] }}</td>
+          <td>{{ row['fecha'] }}</td>
+          <td>{{ row['hora'] }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
   </body>
 </html>
