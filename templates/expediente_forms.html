@@ -33,7 +33,9 @@
   </head>
   <body>
     <nav class="navbar">
-      <a href="#">Regresar 🔙</a>
+      <a href="{{ url_for('doctor_page', user=current_user.nombre) }}"
+        >Home 🔙</a
+      >
     </nav>
     <div class="grid">
       <div class="agenda-container">
@@ -132,7 +134,7 @@
           <input
             type="number"
             name="duracion"
-            min="1"
+            min="-1"
             step="1"
             placeholder="Duracion del medicamento (dias)"
             class="input-field"

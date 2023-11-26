@@ -1,101 +1,53 @@
 {% extends "base_doctor.html" %} {% block title %}Doctor page{% endblock %} {%
 block content %}
-<!-- <nav class="navbar">
-    <a href="index.html">Inicio</a>
-    <a href="login.html">Expediente</a>
-    <a href="register.html">Receta</a>
-  </nav> -->
+
 <div class="page-containerMedico">
   <div class="medico-container">
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <h3 class="{{ category }}">{{ message }}</h3>
+    {% endfor %} {% endif %} {% endwith %}
     <h1>Bienvenido Dr: {{ current_user.nombre }}</h1>
 
     <!-- Formulario de búsqueda de pacientes -->
-    <form
-      id="search-form"
-      class="text-center"
-      method="post"
-      action="{{ url_for('mostrar_pacientes') }}"
-    >
-      <input
-        type="text"
-        class="input-field"
-        name="buscador"
-        placeholder="Buscar paciente por nombre"
-      />
-      <button type="submit" class="submit-button">Buscar</button>
-    </form>
-
-    <!-- Resultados de búsqueda de pacientes -->
-    <div id="search-results" class="results">
-      <h2>Resultados de Búsqueda:</h2>
-      <ul>
-        <li><a href="Expediente.html">Paciente 1</a></li>
-        <li><a href="Expediente.html">Paciente 2</a></li>
-        <!-- Agrega más pacientes encontrados aquí -->
-      </ul>
-    </div>
-
-    <!-- Expediente del Paciente -->
-    <h2>Expediente del Paciente:</h2>
-    <div class="expediente-container">
-      <p>Nombre: Paciente 1</p>
-      <p>Edad: 35 años</p>
-      <p>Historial Médico: Historial detallado del paciente.</p>
-
-      <!-- Agrega más detalles del expediente aquí -->
-      <a href="Receta.html">Generar Receta</a>
-    </div>
-    <div class="new-expediente-container">
-      <form id="expediente-form">
-        <h2>Crear nuevo expediente:</h2>
-        <div class="form-group">
-          <label for="username">Nombre del paciente</label><br />
-          <input
-            type="text"
-            id="nombre"
-            name="nombre"
-            class="input-field"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="edad">Edad</label><br />
-          <input
-            type="number"
-            id="edad"
-            name="edad"
-            min="0"
-            class="input-field"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="edad">Historial Medico</label><br />
-          <textarea
-            id="medicamentos"
-            name="medicamentos"
-            rows="4"
-            cols="50"
-            required
-          ></textarea>
-        </div>
-        <button type="submit" class="submit-button">Generar Expediente</button>
+    <div style="width: 500px">
+      <form
+        id="search-form"
+        class="text-center"
+        method="post"
+        action="{{ url_for('mostrar_pacientes') }}"
+      >
+        <input
+          type="text"
+          class="input-field"
+          name="buscador"
+          placeholder="Buscar paciente por nombre"
+        />
+        <button type="submit" class="submit-button">Buscar</button>
       </form>
     </div>
 
-    <!-- Formulario para generar recetas médicas -->
-    <form id="receta-form">
-      <h2>Generar Receta Médica:</h2>
-      <label class="label" for="medicamentos">Medicamentos:</label>
-      <textarea
-        id="medicamentos"
-        name="medicamentos"
-        rows="4"
-        cols="50"
-      ></textarea
-      ><br />
-      <button type="submit" class="submit-button">Generar Receta</button>
-    </form>
+    <div class="container">
+      <h1>Datos de la cuenta</h1>
+      <table class="table table-light table-striped table-hover">
+        <tr>
+          <th>Nombre</th>
+          <td>{{ current_user.nombre }}</td>
+        </tr>
+        <tr>
+          <th>Cedula</th>
+          <td>{{ current_user.cedula }}</td>
+        </tr>
+        <tr>
+          <th>Telefono</th>
+          <td>{{ current_user.telefono }}</td>
+        </tr>
+        <tr>
+          <th>Correo Electronico</th>
+          <td>{{ current_user.correo }}</td>
+        </tr>
+      </table>
+    </div>
   </div>
 </div>
 {% endblock %}

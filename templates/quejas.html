@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
@@ -32,11 +38,15 @@
     </nav>
 
     {% if datos: %}
-    <h1><strong>Evaluacion: </strong>{{ evaluacion }}</h1>
-    <p>"{{ datos["comentario"] }}"</p>
+    <div class="container">
+      <div class="agenda-container">
+        <h1><strong>Evaluacion: </strong>{{ evaluacion }}</h1>
+        <p>"{{ datos["comentario"] }}"</p>
+      </div>
+    </div>
     {% endif %}
 
-    <div class="page-containerQuejas">
+    <div class="page-containerQuejas container">
       <div class="quejas-container">
         <h1>Sistema de Quejas y Sugerencias</h1>
 

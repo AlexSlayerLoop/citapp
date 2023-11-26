@@ -417,27 +417,30 @@ def register_doctor_page():
 @app.route("/user/<user>")
 @login_required
 def user_page(user):
-    for key, value in current_user.__dict__.items():
-        print(f"{key}: {value}")
-
-    return render_template("user.html")
+    return render_template("user.html", current_user=current_user)
 
 
 @app.route("/doctor/<user>")
 @login_required
 def doctor_page(user):
-    for key, value in current_user.__dict__.items():
-        print(f"{key}: {value}")
-
-    return render_template("doctor.html")
+    return render_template("doctor.html", current_user=current_user)
 
 
 @app.route("/secretary/<user>")
 @login_required
 def secretary_page(user):
-    for key, value in current_user.__dict__.items():
-        print(f"{key}: {value}")
-    return render_template("secretary.html")
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """SELECT secretaria.nombre AS secretaria, doctor.nombre AS doctor, secretaria.correo
+            FROM secretaria 
+            INNER JOIN doctor
+                ON secretaria.id_doctor = doctor.id
+            WHERE secretaria.id = '{}'
+            """.format(current_user.id)
+        )
+        datos_secretaria = cursor.fetchone()
+    return render_template("secretary.html", datos_secretaria=datos_secretaria)
 
 
 @app.route("/agendador", methods=["GET", "POST"])
@@ -963,8 +966,6 @@ def crear_receta():
                 WHERE paciente.id = {}""".format(id_paciente) )
             telefono = cursor.fetchone()
             
-            print(telefono)
-            
         cur_date = datetime.today().strftime("%d/%m/%Y")
         try:
             mensaje = client.messages.create(
@@ -981,9 +982,9 @@ def crear_receta():
             print(f"An Error ocurred {e}")
             
         return redirect(url_for("doctor_page", user=current_user.nombre))
-            
     abort(404)
-    
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('page_not_found.html'), 404

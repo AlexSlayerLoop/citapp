@@ -1,14 +1,15 @@
 {% extends "base_doctor.html" %} {% block title %}Horario{% endblock %} {% block
-content %}
+content %} {% with messages = get_flashed_messages(with_categories=true) %} {%
+if messages %} {% for category, message in messages %}
+<h3 class="{{ category }}">{{ message }}</h3>
+{% endfor %} {% endif %} {% endwith %}
 
-{% with messages = get_flashed_messages(with_categories=true) %} 
-  {% if messages %} 
-    {% for category, message in messages %}
-      <h3 class="{{ category }}">{{ message }}</h3>
-    {% endfor %} 
-  {% endif %} 
-{% endwith %}
-
+<div class="container">
+  <p>
+    NOTA: se debe tener en cuenta que debe seleccionar horas completas ej. 8:00
+    - 14:00
+  </p>
+</div>
 <div class="page-containerIn">
   <div class="login-container">
     <form
@@ -20,6 +21,7 @@ content %}
         <label for="hora_entrada">Horario Entrada</label>
         <input
           type="time"
+          step="3600"
           id="hora_entrada"
           name="hora_entrada"
           class="input-field"
@@ -29,6 +31,7 @@ content %}
         <label for="hora_salida">Horario Salida</label>
         <input
           type="time"
+          step="3600"
           id="hora_salida"
           name="hora_salida"
           class="input-field"
