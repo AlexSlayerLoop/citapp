@@ -16,6 +16,7 @@ if messages %} {% for category, message in messages %}
       action="{{ url_for('horario_doctor') }}"
       method="post"
       id="login-form"
+      onsubmit="return validarHoras()"
     >
       <div class="form-group">
         <label for="hora_entrada">Horario Entrada</label>
@@ -42,4 +43,19 @@ if messages %} {% for category, message in messages %}
     </form>
   </div>
 </div>
+<script>
+  function validarHoras() {
+    // Obtener los valores de los campos de hora
+    var hora_entrada = document.getElementById("hora_entrada").value;
+    var hora_salida = document.getElementById("hora_salida").value;
+
+    // Comparar las fechas
+    if (hora_entrada >= hora_salida) {
+      alert("La hora de inicio debe ser anterior a la hora de fin");
+      return false;
+    }
+
+    return true;
+  }
+</script>
 {% endblock %}
