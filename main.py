@@ -22,6 +22,7 @@ from pymysql.cursors import DictCursor
 from users import User, Doctor, Secretary
 from twilio.rest import Client
 from config import TwilioConfig
+from datetime import datetime
 import os
 
 ALLOWED_EXTENSIONS = {"pdf", "png", "jpg", "jpeg"}
@@ -872,7 +873,8 @@ def mostrar_pacientes():
             cursor.execute(
                 """SELECT id AS id_paciente, nombre, fecha_nacimiento 
                 FROM paciente 
-                WHERE nombre LIKE '%{}%'""".format(paciente_buscado)
+                WHERE nombre LIKE '%{}%'
+                """.format(paciente_buscado)
             )
             pacientes = cursor.fetchall()
         return render_template("mostrar_pacientes.html", pacientes=pacientes, length=len(pacientes))
@@ -880,7 +882,7 @@ def mostrar_pacientes():
     with mysql.connect() as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id AS id_paciente, nombre, fecha_nacimiento FROM paciente"
+            "SELECT id AS id_paciente, nombre, fecha_nacimiento FROM paciente ORDER BY nombre"
         )
         pacientes = cursor.fetchall()
 
@@ -918,7 +920,69 @@ def mostrar_expediente():
         )
     
     abort(404)
+    
+@app.route('/crear_receta', methods=["GET", "POST"])
+def crear_receta():
+    if request.method == "POST":
+        id_selected = request.form.get("id_selected")
+        if id_selected:
+            return render_template("form_receta.html", id_selected=id_selected)
         
+        id_paciente = request.form.get("id_paciente")
+        temperatura = request.form.get("temperatura")
+        presion_arterial = request.form.get("presion_arterial")
+        diagnostico = request.form.get("diagnostico")
+        indicaciones_generales = request.form.get("indicaciones_generales")
+        
+        query = """
+        INSERT INTO receta_medica (
+            id_paciente,
+            id_doctor, 
+            temperatura, 
+            presion_arterial, 
+            diagnostico, 
+            indicaciones_generales )
+        VALUES (%s, %s, %s, %s, %s, %s)"""
+        values = (
+            id_paciente, 
+            current_user.id, 
+            temperatura, 
+            presion_arterial, 
+            diagnostico, 
+            indicaciones_generales )
+        
+        with mysql.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, values)
+            conn.commit()
+            
+            cursor.execute("""
+                SELECT telefono FROM paciente
+                INNER JOIN usuario
+                ON usuario.id = paciente.id_usuario
+                WHERE paciente.id = {}""".format(id_paciente) )
+            telefono = cursor.fetchone()
+            
+            print(telefono)
+            
+        cur_date = datetime.today().strftime("%d/%m/%Y")
+        try:
+            mensaje = client.messages.create(
+                from_="+13394692386",
+                body=f"""VITAL HEALTH CARE - RECETA:
+                Diagnostico: {diagnostico}
+                Indicaciones Generales: {indicaciones_generales}
+                Niveles de presion arterial: {presion_arterial}
+                Temperatura: {temperatura}
+                fecha: {cur_date}""",
+                to=f"+52{telefono['telefono']}"
+            )
+        except Exception as e:
+            print(f"An Error ocurred {e}")
+            
+        return redirect(url_for("doctor_page", user=current_user.nombre))
+            
+    abort(404)
     
 @app.errorhandler(404)
 def page_not_found(error):

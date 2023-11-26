@@ -1,0 +1,67 @@
+{% extends "base_doctor.html" %} {% block title %}Receta{% endblock %} {% block
+content %}
+<div class="agenda-container a">
+  <h1>Receta Medica</h1>
+
+  <form
+    id="prescription-form"
+    method="post"
+    action="{{ url_for('crear_receta') }}"
+  >
+    <input type="hidden" name="id_paciente" value="{{ id_selected }}" />
+    <div class="form-group">
+      <label for="temperatura">Temperatura °C</label><br />
+      <input
+        type="number"
+        id="temperatura"
+        name="temperatura"
+        value=""
+        class="input-field"
+        min="30"
+        max="45"
+        step="0.1"
+      />
+    </div>
+    <div class="form-group">
+      <label for="presion_arterial">Presión arterial</label><br />
+      <input
+        type="text"
+        id="presion_arterial"
+        name="presion_arterial"
+        value=""
+        class="input-field"
+        maxlength="20"
+      />
+    </div>
+    <div class="form-group">
+      <label class="label" for="diagnostico">Diagnóstico</label>
+      <textarea
+        type="text"
+        id="diagnostico"
+        name="diagnostico"
+        value=""
+        rows="4"
+        cols="60"
+        maxlength="255"
+        required
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="label" for="indicaciones_generales">Indicaciones</label>
+      <textarea
+        type="text"
+        id="indicaciones_generales"
+        name="indicaciones_generales"
+        value=""
+        rows="10"
+        cols="60"
+        maxlength="2000"
+        required
+      ></textarea>
+    </div>
+
+    <button type="submit" class="submit-button">Enviar</button>
+  </form>
+</div>
+{% endblock content %}

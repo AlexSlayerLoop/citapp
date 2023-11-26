@@ -28,7 +28,11 @@ title %} {% block content %}
       >
         Ver Expediente
       </button>
-      <button type="submit" formaction="#" class="btn btn-outline-primary">
+      <button
+        type="submit"
+        formaction="{{ url_for('crear_receta') }}"
+        class="btn btn-outline-primary"
+      >
         Crear Receta
       </button>
     </div>
