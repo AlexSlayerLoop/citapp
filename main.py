@@ -485,6 +485,15 @@ def agendador():
                 nombre_paciente=nombre_paciente,
             )
         )
+    with mysql.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM horario")
+        hay_horario = cursor.fetchone()
+        
+    if not hay_horario:
+        flash("No hay horarios disponibles", "error")
+        return render_template("agendador.html")
+    
     # TRANSFIERA LAS CITAS CADUCADAS AL HISTORIAL PARA PODER AGENDAR NUEVAS
     with mysql.connect() as conn:
         cursor = conn.cursor()
@@ -566,6 +575,7 @@ def mostrar_citas_disponibles():
         cursor = conn.cursor()
         cursor.execute(query)
         horarios_doctores = cursor.fetchall()
+    
 
     # modfica los campos hora entrada y hora salida a tipos enteros
     for registro in horarios_doctores:
@@ -685,10 +695,14 @@ def mostrar_quejas():
         cursor = conn.cursor()
         cursor.execute(query)
         rows = cursor.fetchall()
-
-    return render_template("mostrar_quejas.html", datos=rows)
-
-
+    
+    if "cedula" in current_user.__dict__.keys():
+        return render_template("mostrar_quejas.html", datos=rows)
+    
+    else:
+        return render_template("mostrar_quejas_secretaria.html", datos=rows)
+        
+    
 @app.route("/actualizar_horario", methods=["GET", "POST"])
 @login_required
 def horario_doctor():

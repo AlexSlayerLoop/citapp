@@ -32,6 +32,12 @@
       <div class="page-containerAgenda">
         <div class="agenda-container">
           <h1>Agendador de Citas</h1>
+
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %} {% for category, message in messages %}
+          <h3 class="{{ category }}">{{ message }}</h3>
+          {% endfor %} {% endif %} {% endwith %}
+
           <form
             id="agenda-form"
             action="{{ url_for('agendador') }}"
